@@ -1,13 +1,16 @@
-// src/components/Login.js
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; 
+import { Link, useNavigate } from 'react-router-dom'; // Update import
 import { useToasts } from 'react-toast-notifications';
+import { useDispatch } from 'react-redux';
+import { loginSuccess, setUser } from '../redux/actions/authActions';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const { addToast } = useToasts(); 
+  const { addToast } = useToasts();
+  const dispatch = useDispatch();
+  const navigate = useNavigate(); // Correct import
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,7 +25,21 @@ const Login = () => {
 
       if (response.status === 200) {
         const data = await response.json();
-        console.log('Token:', data.access_token);
+        dispatch(loginSuccess(data.access_token));
+        console.log(data.access_token);
+        const response2 = await fetch('https://todo-list-fast-api.onrender.com/api/auth/user', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${data.access_token}`
+          }
+        });
+        const data2 = await response2.json();
+        console.log(data2.username);
+        dispatch(setUser(data2.username));
+        
+        // Redirect to /home after successful login
+        navigate('/home');
       } else if (response.status === 401) {
         addToast('Incorrect password. Please try again.', { appearance: 'error' });
       } else if (response.status === 404) {
