@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; // Update import
 import { useToasts } from 'react-toast-notifications';
 import { useDispatch } from 'react-redux';
-import { loginSuccess, setUser } from '../redux/actions/authActions';
+import { loginSuccess, setTodoList, setUser } from '../redux/actions/authActions';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -26,7 +26,7 @@ const Login = () => {
       if (response.status === 200) {
         const data = await response.json();
         dispatch(loginSuccess(data.access_token));
-        console.log(data.access_token);
+        // console.log(data.access_token);
         const response2 = await fetch('https://todo-list-fast-api.onrender.com/api/auth/user', {
           method: 'GET',
           headers: {
@@ -35,10 +35,8 @@ const Login = () => {
           }
         });
         const data2 = await response2.json();
-        console.log(data2.username);
+        // console.log(data2.username);
         dispatch(setUser(data2.username));
-        
-        // Redirect to /home after successful login
         navigate('/home');
       } else if (response.status === 401) {
         addToast('Incorrect password. Please try again.', { appearance: 'error' });

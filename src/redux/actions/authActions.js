@@ -19,10 +19,13 @@ export const setUser = (user) => {
   };
 };
 
-export const setTodoList = (todoList) => ({
-  type: SET_TODO_LIST,
-  payload: todoList,
-});
+export const setTodoList = (todoList) => {
+  localStorage.setItem('todo',todoList);
+  return{
+    type: SET_TODO_LIST,
+    payload: todoList,
+  };
+};
 
 export const fetchUserAndTodoList = () => async (dispatch, getState) => {
   const state = getState();
@@ -30,13 +33,13 @@ export const fetchUserAndTodoList = () => async (dispatch, getState) => {
 
   try {
     // Fetch user info
-    const userResponse = await fetch('https://todo-list-fast-api.onrender.com/api/auth/user', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    const userData = await userResponse.json();
+    // const userResponse = await fetch('https://todo-list-fast-api.onrender.com/api/auth/user', {
+    //   method: 'GET',
+    //   headers: {
+    //     'Authorization': `Bearer ${token}`
+    //   }
+    // });
+    // const userData = await userResponse.json();
 
     // Fetch todo list
     const todoListResponse = await fetch('https://todo-list-fast-api.onrender.com/api/todo/', {
@@ -47,7 +50,6 @@ export const fetchUserAndTodoList = () => async (dispatch, getState) => {
     });
     const todoListData = await todoListResponse.json();
 
-    dispatch(setUser(userData));
     dispatch(setTodoList(todoListData));
   } catch (error) {
     console.error('Error:', error);
