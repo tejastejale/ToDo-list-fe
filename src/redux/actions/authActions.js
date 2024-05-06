@@ -3,6 +3,9 @@ export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const SET_USER = 'SET_USER';
 export const SET_TODO_LIST = 'SET_TODO_LIST';
 
+
+const url = "https://technical-brittaney-sitrc-bdf3a6c7.koyeb.app";
+
 export const loginSuccess = (token) => {
   localStorage.setItem('token', token);
   return {
@@ -42,7 +45,7 @@ export const fetchUserAndTodoList = () => async (dispatch, getState) => {
     // const userData = await userResponse.json();
 
     // Fetch todo list
-    const todoListResponse = await fetch('https://todo-list-fast-api.onrender.com/api/todo/', {
+    const todoListResponse = await fetch(`${url}/api/todo/`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`

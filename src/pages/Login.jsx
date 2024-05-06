@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'; // Update import
 import { useToasts } from 'react-toast-notifications';
 import { useDispatch } from 'react-redux';
 import { loginSuccess, setTodoList, setUser } from '../redux/actions/authActions';
-
+const url = "https://technical-brittaney-sitrc-bdf3a6c7.koyeb.app";
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,7 +15,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('https://todo-list-fast-api.onrender.com/api/auth/login', {
+      const response = await fetch(`${url}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -27,7 +27,7 @@ const Login = () => {
         const data = await response.json();
         dispatch(loginSuccess(data.access_token));
         // console.log(data.access_token);
-        const response2 = await fetch('https://todo-list-fast-api.onrender.com/api/auth/user', {
+        const response2 = await fetch(`${url}/api/auth/user`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

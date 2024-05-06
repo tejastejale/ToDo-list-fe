@@ -1,8 +1,8 @@
 // src/components/Register.js
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useToasts } from 'react-toast-notifications'; // Import useToasts hook
-
+import { useToasts } from 'react-toast-notifications';
+const url = "https://technical-brittaney-sitrc-bdf3a6c7.koyeb.app";
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,7 +13,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('https://todo-list-fast-api.onrender.com/api/auth/register', {
+      const response = await fetch(`${url}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

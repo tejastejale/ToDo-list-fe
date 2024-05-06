@@ -1,0 +1,1 @@
+export default url = "https://technical-brittaney-sitrc-bdf3a6c7.koyeb.app";

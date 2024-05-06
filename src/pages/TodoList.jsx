@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+const url = "https://technical-brittaney-sitrc-bdf3a6c7.koyeb.app";
 const TodoList = () => {
   const token = useSelector(state => state.auth.token);
   const [todoList, setTodoList] = useState([]);
@@ -12,7 +13,7 @@ const TodoList = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('https://todo-list-fast-api.onrender.com/api/todo', {
+        const response = await fetch(`${url}/api/todo`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -45,7 +46,7 @@ const TodoList = () => {
   // Delete a todo item
   const handleDelete = async (id) => {
     try {
-      await fetch(`https://todo-list-fast-api.onrender.com/api/todo/${id}`, {
+      await fetch(`${url}/api/todo/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -62,7 +63,7 @@ const TodoList = () => {
   // Modify a todo item
   const handleModify = async (id, updatedTask, updatedDone) => {
     try {
-      await fetch(`https://todo-list-fast-api.onrender.com/api/todo/${id}`, {
+      await fetch(`${url}/api/todo/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +93,7 @@ const TodoList = () => {
   // Add a new todo item
   const handleAddTask = async () => {
     try {
-      const response = await fetch('https://todo-list-fast-api.onrender.com/api/todo', {
+      const response = await fetch(`${url}/api/todo`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
