@@ -9,7 +9,6 @@ import {
 } from "@material-tailwind/react";
 import DoneIcon from "@mui/icons-material/Done";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { data } from "autoprefixer";
 
 const url = "https://technical-brittaney-sitrc-bdf3a6c7.koyeb.app";
 const TodoList = () => {
@@ -19,6 +18,7 @@ const TodoList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTaskName, setNewTaskName] = useState("");
   const [newTaskDone, setNewTaskDone] = useState(false);
+  const [charCount, setCharCount] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,18 +30,22 @@ const TodoList = () => {
             Authorization: `Bearer ${token}`,
           },
         });
+        if (!response.ok) {
+          throw new Error('Failed to fetch');
+        }
         const data = await response.json();
         setTodoList(data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-    fetchData();
+    if (token) {
+      fetchData();
+    }
   }, [token]);
 
   const user = useSelector((state) => state.auth.user);
 
-  // Count completed and incomplete tasks based on the filter
   const completed = todoList.filter((todo) => todo.done).length;
   const inCompleted = todoList.filter((todo) => !todo.done).length;
   let filteredList = [];
@@ -52,28 +56,32 @@ const TodoList = () => {
   } else if (filter === "complete") {
     filteredList = todoList.filter((todo) => todo.done);
   }
-
-  // Delete a todo item
+  const handleTaskNameChange = (e) => {
+    setNewTaskName(e.target.value);
+    setCharCount(e.target.value.length);
+  };
+  
   const handleDelete = async (id) => {
     try {
-      await fetch(`${url}/api/todo/${id}`, {
+      const response = await fetch(`${url}/api/todo/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
-      // Remove the deleted todo item from the list
+      if (!response.ok) {
+        throw new Error('Failed to delete');
+      }
       setTodoList(todoList.filter((todo) => todo.id !== id));
     } catch (error) {
       console.error("Error deleting todo:", error);
     }
   };
 
-  // Modify a todo item
   const handleModify = async (id, updatedTask, updatedDone) => {
     try {
-      await fetch(`${url}/api/todo/${id}`, {
+      const response = await fetch(`${url}/api/todo/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -84,7 +92,9 @@ const TodoList = () => {
           done: updatedDone,
         }),
       });
-      // Update the todo list after modification
+      if (!response.ok) {
+        throw new Error('Failed to modify');
+      }
       setTodoList(
         todoList.map((todo) => {
           if (todo.id === id) {
@@ -102,7 +112,6 @@ const TodoList = () => {
     }
   };
 
-  // Add a new todo item
   const handleAddTask = async () => {
     try {
       const response = await fetch(`${url}/api/todo`, {
@@ -116,12 +125,13 @@ const TodoList = () => {
           done: newTaskDone,
         }),
       });
+      if (!response.ok) {
+        throw new Error('Failed to add');
+      }
       const newTodo = await response.json();
       setTodoList([...todoList, newTodo]);
-      // Reset modal fields
       setNewTaskName("");
       setNewTaskDone(false);
-      // Close the modal
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error adding todo:", error);
@@ -129,41 +139,35 @@ const TodoList = () => {
   };
 
   return (
-    <div className="flex w-full h-[100vh] bg-gray-900 ">
+    <div className="flex w-full h-[100vh] bg-gray-900">
       <div className="container mx-auto mt-8 bg-gray-900 text-white">
         <h1 className="text-3xl font-bold mb-8 text-center">Hey, {user}!</h1>
-        <div className="flex flex-row justify-center gap-10 ">
-          {/* Create Task Card */}
+        <div className="flex flex-row justify-center gap-10">
           <div
-            className="p-4 bg-gray-800 rounded-lg w-56"
+            className="p-4 bg-gray-800 rounded-lg w-56 cursor-pointer"
             onClick={() => setIsModalOpen(true)}
           >
             <h2 className="text-md font-semibold">Create Task</h2>
             <p className="text-9xl text-center font-bold">+</p>
           </div>
 
-          {/* Total Tasks Card */}
           <div className="p-4 bg-gray-800 rounded-lg w-56">
             <h2 className="text-lg font-semibold">Total Tasks</h2>
             <p className="text-9xl text-center font-bold">{todoList.length}</p>
           </div>
 
-          {/* Remaining Tasks Card */}
           <div className="p-4 bg-gray-800 rounded-lg w-56">
             <h2 className="text-lg font-semibold">Remaining Tasks</h2>
             <p className="text-9xl text-center font-bold">{inCompleted}</p>
           </div>
 
-          {/* Completed Tasks Card */}
           <div className="p-4 bg-gray-800 rounded-lg w-56">
             <h2 className="text-lg font-semibold">Completed Tasks</h2>
             <p className="text-9xl text-center font-bold">{completed}</p>
           </div>
 
-          {/* Graph of Completed Tasks */}
           <div className="bg-gray-800 w-56 p-4 rounded-lg">
             <svg className="w-full h-full" viewBox="0 0 100 100">
-              {/* Background Circle */}
               <circle
                 cx="50"
                 cy="50"
@@ -172,20 +176,18 @@ const TodoList = () => {
                 stroke="#333"
                 strokeWidth="10"
               />
-              {/* Completed Circle */}
               <circle
                 cx="50"
                 cy="50"
                 r="40"
                 fill="none"
-                stroke="#4CAF50" // Dark green color
+                stroke="#4CAF50"
                 strokeWidth="10"
                 strokeDasharray={`${(completed / todoList.length) * 251} 251`}
                 strokeDashoffset="0"
                 strokeLinecap="round"
                 transform="rotate(-90 50 50)"
               />
-              {/* Percentage Label */}
               <text
                 x="50"
                 y="55"
@@ -204,7 +206,6 @@ const TodoList = () => {
         </div>
         <div className="container mx-auto mt-8 p-3 bg-gray-900">
           <h1 className="text-2xl font-bold mb-4">Todo List</h1>
-          {/* Filter Buttons */}
           <div className="flex justify-center mb-4">
             <button
               className={`mr-4 px-4 py-2 rounded-full ${
@@ -237,20 +238,18 @@ const TodoList = () => {
               Complete
             </button>
           </div>
-          {/* Todo List */}
           <div className="w-full gap-10 h-32 grid grid-cols-4">
             {filteredList.map((todo) => (
               <div
                 key={todo.id}
-                className={`rounded-md mb-4 h-32 max-h-32 w-80
-                text-white`}
+                className={`rounded-md mb-4 h-32 max-h-32 w-80 text-white`}
               >
                 <div
                   className={`${
                     todo.done ? "border-green-500" : "border-red-500"
                   } border-[1px] rounded-xl bg-gray-600`}
                 >
-                  <Card className=" w-[19.7rem] bg-gray-800 shadow-md text-white h-28 ">
+                  <Card className="w-[19.7rem] bg-gray-800 shadow-md text-white h-28">
                     <CardBody>
                       <Typography
                         variant="h6"
@@ -269,43 +268,22 @@ const TodoList = () => {
                       }
                       className="justify-start bg-green-500 px-4 py-2"
                     >
-                      {DoneIcon}
+                      <DoneIcon />
                     </Button>
                     <Button
                       onClick={() => handleDelete(todo.id)}
                       className="justify-end px-4 py-2 bg-red-500"
                     >
-                      Delete
+                      <DeleteIcon />
                     </Button>
                   </div>
                 </div>
-                {/* <div className="overflow-auto bg-gray-800 rounded-md p-4">
-                  <p className="overflow-auto">{todo.task}</p>
-                </div>
-                <div className="grid grid-col-1 h-full align-bottom pt-1">
-                  <div className="flex flex-row align-bottom h-20 px-4 justify-between mt-2">
-                    <button
-                      className="px-3 py-1 h-fit bg-blue-500 text-white align-bottom rounded-md"
-                      onClick={() =>
-                        handleModify(todo.id, todo.task, !todo.done)
-                      }
-                    >
-                      Done
-                    </button>
-                    <button
-                      className="px-3 py-1 h-fit bg-red-500 text-white rounded-md"
-                      onClick={() => handleDelete(todo.id)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div> */}
               </div>
             ))}
           </div>
         </div>
       </div>
-      {isModalOpen && (
+     {isModalOpen && (
         <div className="fixed z-10 inset-0 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen">
             <div className="bg-white rounded-lg w-1/2">
@@ -316,8 +294,11 @@ const TodoList = () => {
                   className="w-full border border-gray-300 p-2 mb-2"
                   placeholder="Task Name"
                   value={newTaskName}
-                  onChange={(e) => setNewTaskName(e.target.value)}
+                  maxLength={100}
+                  onChange={handleTaskNameChange}
                 />
+                      <p className="text-right text-sm text-gray-500">{charCount}/100 characters</p>
+
                 <div className="flex items-center mb-2">
                   <input
                     type="checkbox"
